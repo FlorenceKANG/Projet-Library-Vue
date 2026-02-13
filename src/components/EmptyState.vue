@@ -1,6 +1,5 @@
 <script setup lang="ts">
 defineProps<{
-  show: boolean
   icon: string
   title: string
   description: string
@@ -8,11 +7,7 @@ defineProps<{
 </script>
 
 <template>
-  <article
-    v-if="show"
-    class="medium middle-align center-align"
-    style="width: -webkit-fill-available"
-  >
+  <article class="medium middle-align center-align" style="width: -webkit-fill-available">
     <div>
       <i class="extra">{{ icon }}</i>
       <h5>{{ title }}</h5>

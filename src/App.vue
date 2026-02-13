@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import SearchBar from './components/SearchBar.vue'
 import BookItem from './components/BookItem.vue'
 import type { Book } from './@types'
@@ -9,14 +9,26 @@ const books = ref<Book[]>([])
 const input = ref<string>('')
 const state = ref<'idle' | 'loading' | 'success' | 'error'>('idle')
 
+let controller: AbortController | null = null
+
+const hasNoResults = computed(
+  () => input.value && state.value === 'success' && books.value.length === 0,
+)
+
 const onSearch = async () => {
-  if (!input.value.trim()) return
+  const query = input.value.trim()
+  if (!query) return
+
+  // Annule la requête précédente si elle existe
+  controller?.abort()
+  controller = new AbortController()
 
   state.value = 'loading'
 
   try {
     const response = await fetch(
       `https://openlibrary.org/search.json?q=${encodeURIComponent(input.value.trim())}`,
+      { signal: controller.signal },
     )
 
     if (!response.ok) {
@@ -25,7 +37,7 @@ const onSearch = async () => {
 
     const data = await response.json()
 
-    books.value = data.docs
+    books.value = data.docs ?? []
     state.value = 'success'
   } catch (error) {
     console.error(error)
@@ -34,8 +46,10 @@ const onSearch = async () => {
 }
 
 const onReset = () => {
+  controller?.abort()
   input.value = ''
   books.value = []
+  state.value = 'idle'
 }
 </script>
 
@@ -52,20 +66,20 @@ const onReset = () => {
       <progress v-if="state === 'loading'" class="circle wavy indeterminate" value="50" max="100" />
 
       <EmptyState
-        :show="state === 'error'"
+        v-else-if="state === 'error'"
         icon="error"
         title="Une erreur est survenue."
         description="Veuillez réessayer plus tard."
       />
 
       <EmptyState
-        :show="Boolean(input) && state === 'success' && books.length === 0"
+        v-else-if="hasNoResults"
         icon="search"
         title="Pas de résultat"
         description="Aucune donnée trouvée à votre recherche."
       />
 
-      <ul v-if="state === 'success'" class="list border" style="width: -webkit-fill-available">
+      <ul v-else-if="state === 'success'" class="list border" style="width: -webkit-fill-available">
         <li v-for="book in books" :key="book.key" class="row">
           <BookItem :book="book" />
         </li>
