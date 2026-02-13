@@ -1,14 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import SearchBar from './components/SearchBar.vue'
-
-interface Book {
-  key: string
-  title: string
-  author_name?: string[]
-  first_publish_year?: number
-  cover_i?: number
-}
+import BookItem from './components/BookItem.vue'
+import type { Book } from './@types'
 
 const books = ref<Book[]>([])
 const input = ref<string>('')
@@ -41,10 +35,6 @@ const onSearch = async () => {
 const onReset = () => {
   input.value = ''
   books.value = []
-}
-
-const getCoverUrl = (coverId: number) => {
-  return `https://covers.openlibrary.org/b/id/${coverId}-L.jpg`
 }
 </script>
 
@@ -83,16 +73,7 @@ const getCoverUrl = (coverId: number) => {
       </article>
       <ul v-if="state === 'success'" class="list border" style="width: -webkit-fill-available">
         <li v-for="book in books" :key="book.key" class="row">
-          <img
-            :src="getCoverUrl(book.cover_i as number)"
-            :alt="book.title"
-            width="80px"
-            height="80px"
-          />
-          <div>
-            <p class="bold">{{ book.title }} ({{ book.first_publish_year }})</p>
-            <p class="italic">{{ book.author_name?.join(', ') }}</p>
-          </div>
+          <BookItem :book="book" />
         </li>
       </ul>
     </div>
