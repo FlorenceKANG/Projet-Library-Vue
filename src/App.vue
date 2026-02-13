@@ -56,13 +56,31 @@ const getCoverUrl = (coverId: number) => {
       </label>
       <button class="small-round large search-btn" @click="onSearch">Rechercher</button>
     </div>
-    <div>
-      <p v-if="state === 'loading'">Chargement...</p>
-      <p v-if="state === 'error'">Une erreur est survenue.</p>
-      <p v-if="input && state === 'success' && books.length === 0">
-        Aucune donnée trouvée à votre recherche.
-      </p>
-      <ul v-if="state === 'success'">
+    <div class="container">
+      <progress v-if="state === 'loading'" class="circle wavy indeterminate" value="50" max="100" />
+      <article
+        v-if="state === 'error'"
+        class="medium middle-align center-align"
+        style="width: -webkit-fill-available"
+      >
+        <div>
+          <i class="extra">error</i>
+          <h5>Une erreur est survenue.</h5>
+          <p>Veuillez réessayer plus tard.</p>
+        </div>
+      </article>
+      <article
+        v-if="input && state === 'success' && books.length === 0"
+        class="medium middle-align center-align"
+        style="width: -webkit-fill-available"
+      >
+        <div>
+          <i class="extra">search</i>
+          <h5>Pas de résultat.</h5>
+          <p>Aucune donnée trouvée à votre recherche.</p>
+        </div>
+      </article>
+      <ul v-if="state === 'success'" class="list border" style="width: -webkit-fill-available">
         <li v-for="book in books" :key="book.key" class="row">
           <img
             :src="getCoverUrl(book.cover_i as number)"
@@ -90,12 +108,12 @@ h1 {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  margin: 1rem;
+  padding: 1rem;
 }
 .search {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 0.5rem;
+  column-gap: 0.5rem;
 }
 .search-input {
   grid-area: span 4 / span 4;
