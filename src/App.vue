@@ -1,8 +1,50 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ref } from 'vue'
+
+interface Book {
+  key: string
+  title: string
+  author_name?: string[]
+  first_publish_year?: number
+  cover_i?: number
+}
+
+const books = ref<Book[]>([])
+const input = ref<string>('')
+const state = ref<'idle' | 'loading' | 'success' | 'error'>('idle')
+
+const onSearch = async () => {
+  if (!input.value.trim()) return
+
+  state.value = 'loading'
+
+  try {
+    const response = await fetch(
+      `https://openlibrary.org/search.json?q=${encodeURIComponent(input.value.trim())}`,
+    )
+
+    if (!response.ok) {
+      throw new Error(`Error HTTP: ${response.status}`)
+    }
+
+    const data = await response.json()
+
+    books.value = data.docs
+    state.value = 'success'
+  } catch (error) {
+    console.error(error)
+    state.value = 'error'
+  }
+}
+
+const getCoverUrl = (coverId: number) => {
+  return `https://covers.openlibrary.org/b/id/${coverId}-L.jpg`
+}
+</script>
 
 <template>
   <header class="container">
-    <img src="./assets/logo.png" alt="Logo du site" />
+    <img src="./assets/logo.png" alt="Logo du site" width="100px" height="100px" />
     <h1>Bienvenue Chez Vue Library !</h1>
   </header>
 
@@ -10,9 +52,30 @@
     <div class="search">
       <label for="search" class="field border prefix search-input">
         <i>search</i>
-        <input id="search" type="text" placeholder="Chercher l'oeuvre souhaité" />
+        <input id="search" type="text" placeholder="Chercher l'oeuvre souhaitée" v-model="input" />
       </label>
-      <button class="small-round large search-btn">Rechercher</button>
+      <button class="small-round large search-btn" @click="onSearch">Rechercher</button>
+    </div>
+    <div>
+      <p v-if="state === 'loading'">Chargement...</p>
+      <p v-if="state === 'error'">Une erreur est survenue.</p>
+      <p v-if="input && state === 'success' && books.length === 0">
+        Aucune donnée trouvée à votre recherche.
+      </p>
+      <ul v-if="state === 'success'">
+        <li v-for="book in books" :key="book.key" class="row">
+          <img
+            :src="getCoverUrl(book.cover_i as number)"
+            :alt="book.title"
+            width="80px"
+            height="80px"
+          />
+          <div>
+            <p class="bold">{{ book.title }} ({{ book.first_publish_year }})</p>
+            <p class="italic">{{ book.author_name?.join(', ') }}</p>
+          </div>
+        </li>
+      </ul>
     </div>
   </main>
 </template>
