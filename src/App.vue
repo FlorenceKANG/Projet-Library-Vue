@@ -38,6 +38,11 @@ const onSearch = async () => {
   }
 }
 
+const onReset = () => {
+  input.value = ''
+  books.value = []
+}
+
 const getCoverUrl = (coverId: number) => {
   return `https://covers.openlibrary.org/b/id/${coverId}-L.jpg`
 }
@@ -50,7 +55,7 @@ const getCoverUrl = (coverId: number) => {
   </header>
 
   <main>
-    <SearchBar v-model="input" :onSearch="onSearch" />
+    <SearchBar v-model="input" @search="onSearch" @reset="onReset" />
 
     <div class="container">
       <progress v-if="state === 'loading'" class="circle wavy indeterminate" value="50" max="100" />
