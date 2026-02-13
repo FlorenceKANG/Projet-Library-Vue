@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import SearchBar from './components/SearchBar.vue'
 
 interface Book {
   key: string
@@ -49,13 +50,8 @@ const getCoverUrl = (coverId: number) => {
   </header>
 
   <main>
-    <div class="search">
-      <label for="search" class="field border prefix search-input">
-        <i>search</i>
-        <input id="search" type="text" placeholder="Chercher l'oeuvre souhaitée" v-model="input" />
-      </label>
-      <button class="small-round large search-btn" @click="onSearch">Rechercher</button>
-    </div>
+    <SearchBar v-model="input" :onSearch="onSearch" />
+
     <div class="container">
       <progress v-if="state === 'loading'" class="circle wavy indeterminate" value="50" max="100" />
       <article
