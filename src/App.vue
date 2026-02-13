@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import SearchBar from './components/SearchBar.vue'
 import BookItem from './components/BookItem.vue'
 import type { Book } from './@types'
+import EmptyState from './components/EmptyState.vue'
 
 const books = ref<Book[]>([])
 const input = ref<string>('')
@@ -49,28 +50,21 @@ const onReset = () => {
 
     <div class="container">
       <progress v-if="state === 'loading'" class="circle wavy indeterminate" value="50" max="100" />
-      <article
-        v-if="state === 'error'"
-        class="medium middle-align center-align"
-        style="width: -webkit-fill-available"
-      >
-        <div>
-          <i class="extra">error</i>
-          <h5>Une erreur est survenue.</h5>
-          <p>Veuillez réessayer plus tard.</p>
-        </div>
-      </article>
-      <article
-        v-if="input && state === 'success' && books.length === 0"
-        class="medium middle-align center-align"
-        style="width: -webkit-fill-available"
-      >
-        <div>
-          <i class="extra">search</i>
-          <h5>Pas de résultat.</h5>
-          <p>Aucune donnée trouvée à votre recherche.</p>
-        </div>
-      </article>
+
+      <EmptyState
+        :show="state === 'error'"
+        icon="error"
+        title="Une erreur est survenue."
+        description="Veuillez réessayer plus tard."
+      />
+
+      <EmptyState
+        :show="Boolean(input) && state === 'success' && books.length === 0"
+        icon="search"
+        title="Pas de résultat"
+        description="Aucune donnée trouvée à votre recherche."
+      />
+
       <ul v-if="state === 'success'" class="list border" style="width: -webkit-fill-available">
         <li v-for="book in books" :key="book.key" class="row">
           <BookItem :book="book" />
