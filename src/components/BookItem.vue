@@ -4,6 +4,7 @@ import type { Book } from '@/@types'
 defineProps<{ book: Book }>()
 
 const getCoverUrl = (coverId: number) => {
+  if (!coverId) return '/default_cover.svg'
   return `https://covers.openlibrary.org/b/id/${coverId}-L.jpg`
 }
 </script>
