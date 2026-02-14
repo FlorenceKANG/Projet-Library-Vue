@@ -12,7 +12,9 @@ const getCoverUrl = (coverId: number) => {
 <template>
   <img :src="getCoverUrl(book.cover_i as number)" :alt="book.title" width="80px" height="80px" />
   <div style="flex: initial">
-    <p class="bold">{{ book.title }} ({{ book.first_publish_year }})</p>
-    <p class="italic">{{ book.author_name?.join(', ') }}</p>
+    <p class="bold">
+      {{ book.title }} <span v-if="book.first_publish_year">({{ book.first_publish_year }})</span>
+    </p>
+    <p class="italic" v-if="book.author_name">{{ book.author_name?.join(', ') }}</p>
   </div>
 </template>

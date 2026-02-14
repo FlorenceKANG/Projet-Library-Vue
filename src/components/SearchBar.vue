@@ -13,7 +13,7 @@ const emit = defineEmits<{ (e: 'search'): void; (e: 'reset'): void }>()
         placeholder="Chercher l'oeuvre souhaitée"
         v-model="model"
         @keyup.enter="emit('search')"
-        style="position: relative; padding-right: 48px"
+        style="padding-right: 48px"
       />
       <button v-if="model" @click="emit('reset')" class="border large square reset-btn">
         <i>close</i>

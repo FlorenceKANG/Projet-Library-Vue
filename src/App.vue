@@ -1,13 +1,18 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import SearchBar from './components/SearchBar.vue'
 import BookItem from './components/BookItem.vue'
 import type { Book } from './@types'
 import EmptyState from './components/EmptyState.vue'
+import BasePagination from './components/BasePagination.vue'
 
 const books = ref<Book[]>([])
 const input = ref<string>('')
 const state = ref<'idle' | 'loading' | 'success' | 'error'>('idle')
+
+const limit = ref(20)
+const currentPage = ref(1)
+const totalPages = ref(0)
 
 let controller: AbortController | null = null
 
@@ -27,7 +32,7 @@ const onSearch = async () => {
 
   try {
     const response = await fetch(
-      `https://openlibrary.org/search.json?q=${encodeURIComponent(input.value.trim())}`,
+      `https://openlibrary.org/search.json?q=${encodeURIComponent(input.value.trim())}&page=${currentPage.value}&limit=${limit.value}`,
       { signal: controller.signal },
     )
 
@@ -37,6 +42,7 @@ const onSearch = async () => {
 
     const data = await response.json()
 
+    totalPages.value = Math.ceil(data.numFound / limit.value)
     books.value = data.docs ?? []
     state.value = 'success'
   } catch (error) {
@@ -50,7 +56,16 @@ const onReset = () => {
   input.value = ''
   books.value = []
   state.value = 'idle'
+  currentPage.value = 1
+  totalPages.value = 0
 }
+
+// 🔥 Relance la recherche automatiquement quand la page change
+watch(currentPage, () => {
+  if (state.value === 'success') {
+    onSearch()
+  }
+})
 </script>
 
 <template>
@@ -84,6 +99,8 @@ const onReset = () => {
           <BookItem :book="book" />
         </li>
       </ul>
+
+      <BasePagination v-model:model="currentPage" :totalPages="totalPages" />
     </div>
   </main>
 </template>
