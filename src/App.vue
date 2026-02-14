@@ -100,7 +100,7 @@ watch(currentPage, () => {
         </li>
       </ul>
 
-      <BasePagination v-model:model="currentPage" :totalPages="totalPages" />
+      <BasePagination v-model:model="currentPage" :total-pages="totalPages" />
     </div>
   </main>
 </template>

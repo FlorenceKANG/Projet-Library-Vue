@@ -1,22 +1,23 @@
 <script setup lang="ts">
 import { usePagination } from '@/hooks/usePagination'
-import { computed, toRef } from 'vue'
+import { computed, ref, watch } from 'vue'
 
-const props = defineProps<{
-  totalPages: number
-  model: number
-}>()
-
+const props = defineProps<{ totalPages: number; model: number }>()
 const emit = defineEmits<{ (e: 'update:model', value: number): void }>()
 
+// relaye les changements au parent
 const currentPage = computed({
   get: () => props.model,
   set: (value: number) => emit('update:model', value),
 })
 
-const { visiblePages, goToPage, next, previous } = usePagination(
-  currentPage,
-  toRef(props.totalPages),
+const totalPagesRef = ref(props.totalPages)
+
+const { visiblePages, goToPage, next, previous } = usePagination(currentPage, totalPagesRef)
+
+watch(
+  () => props.totalPages, // ancien valeur
+  (val) => (totalPagesRef.value = val), // nouvelle valeur
 )
 </script>
 

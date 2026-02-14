@@ -1,6 +1,6 @@
 import { computed, type Ref } from 'vue'
 
-export function usePagination(currentPage: Ref<number>, totalPages: Ref<number>, delta = 1) {
+export function usePagination(currentPage: Ref<number>, totalPages: Ref<number>) {
   const visiblePages = computed<(number | string)[]>(() => {
     const pages: (number | string)[] = []
     const total = totalPages.value
@@ -9,10 +9,7 @@ export function usePagination(currentPage: Ref<number>, totalPages: Ref<number>,
 
     if (total <= 5) {
       // Si peu de pages → on affiche tout
-      for (let i = 1; i <= total; i++) {
-        pages.push(i)
-      }
-      return pages
+      return Array.from({ length: total }, (_, i) => i + 1)
     }
 
     const start = Math.max(2, current - delta)
@@ -22,19 +19,13 @@ export function usePagination(currentPage: Ref<number>, totalPages: Ref<number>,
     pages.push(1)
 
     // Ajouter "…" si nécessaire avant
-    if (start > 2) {
-      pages.push('...')
-    }
+    if (start > 2) pages.push('...')
 
     // Pages centrales
-    for (let i = start; i <= end; i++) {
-      pages.push(i)
-    }
+    for (let i = start; i <= end; i++) pages.push(i)
 
     // Ajouter "…" si nécessaire après
-    if (end < total - 1) {
-      pages.push('...')
-    }
+    if (end < total - 1) pages.push('...')
 
     // Toujours afficher la dernière page
     pages.push(total)
@@ -48,15 +39,11 @@ export function usePagination(currentPage: Ref<number>, totalPages: Ref<number>,
   }
 
   const next = () => {
-    if (currentPage.value < totalPages.value) {
-      currentPage.value++
-    }
+    if (currentPage.value < totalPages.value) currentPage.value++
   }
 
   const previous = () => {
-    if (currentPage.value > 1) {
-      currentPage.value--
-    }
+    if (currentPage.value > 1) currentPage.value--
   }
 
   return { visiblePages, goToPage, next, previous }
