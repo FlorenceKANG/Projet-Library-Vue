@@ -79,7 +79,7 @@ const onReset = () => {
         description="Aucune donnée trouvée à votre recherche."
       />
 
-      <ul v-else-if="state === 'success'" class="list border" style="width: -webkit-fill-available">
+      <ul v-else-if="state === 'success'" class="list border responsive">
         <li v-for="book in books" :key="book.key" class="row">
           <BookItem :book="book" />
         </li>
@@ -99,16 +99,5 @@ h1 {
   justify-content: center;
   gap: 0.5rem;
   padding: 1rem;
-}
-.search {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  column-gap: 0.5rem;
-}
-.search-input {
-  grid-area: span 4 / span 4;
-}
-.search-btn {
-  grid-column-start: 5;
 }
 </style>
